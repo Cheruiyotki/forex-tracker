@@ -1,122 +1,48 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useMemo, useState } from 'react'
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Activity, BarChart3, BookOpen, BriefcaseBusiness, CircleDollarSign, Filter, LayoutDashboard, Menu, Plus, Search, Settings, ShieldCheck, Target, TrendingUp, X } from 'lucide-react'
 import './App.css'
 
+type Trade = { id: string; date: string; pair: string; direction: 'LONG' | 'SHORT'; entry: number; exit: number; size: number; sl: number; tp: number; rr: number; pnl: number; result: 'WIN' | 'LOSS' | 'OPEN'; setup: string; session: string }
+const seedTrades: Trade[] = [
+  { id: '#7421', date: 'Oct 10, 21:32', pair: 'EURUSD', direction: 'LONG', entry: 1.0852, exit: 1.0897, size: .5, sl: 1.083, tp: 1.091, rr: 3.18, pnl: 226.5, result: 'WIN', setup: 'OB + FVG', session: 'New York' },
+  { id: '#7420', date: 'Oct 10, 18:47', pair: 'BTCUSDT', direction: 'SHORT', entry: 67320, exit: 66850, size: .25, sl: 67620, tp: 66600, rr: 2.8, pnl: 117.5, result: 'WIN', setup: 'Liquidity Sweep', session: 'New York' },
+  { id: '#7419', date: 'Oct 10, 15:20', pair: 'GBPUSD', direction: 'LONG', entry: 1.295, exit: 1.2921, size: .4, sl: 1.293, tp: 1.2985, rr: -1.32, pnl: -116, result: 'LOSS', setup: 'Trend + Structure', session: 'London' },
+  { id: '#7418', date: 'Oct 10, 12:11', pair: 'XAUUSD', direction: 'SHORT', entry: 2662.4, exit: 2658.7, size: .3, sl: 2664, tp: 2655, rr: 1.32, pnl: 111, result: 'WIN', setup: 'EMA Alignment', session: 'London' },
+  { id: '#7417', date: 'Oct 10, 09:45', pair: 'EURUSD', direction: 'LONG', entry: 1.0837, exit: 1.086, size: .6, sl: 1.082, tp: 1.0875, rr: 1.04, pnl: 136.8, result: 'WIN', setup: 'OB + FVG', session: 'London' },
+  { id: '#7416', date: 'Oct 09, 16:09', pair: 'USDJPY', direction: 'SHORT', entry: 149.22, exit: 149.6, size: .4, sl: 149.55, tp: 148.7, rr: -1, pnl: -92, result: 'LOSS', setup: 'Liquidity Sweep', session: 'New York' },
+  { id: '#7415', date: 'Oct 09, 11:25', pair: 'BTCUSDT', direction: 'LONG', entry: 66200, exit: 68100, size: .2, sl: 65200, tp: 68400, rr: 1.9, pnl: 410, result: 'WIN', setup: 'OB + FVG', session: 'Asia' },
+  { id: '#7414', date: 'Oct 08, 14:40', pair: 'GBPUSD', direction: 'SHORT', entry: 1.2981, exit: 1.2955, size: .5, sl: 1.3002, tp: 1.2938, rr: 1.24, pnl: 182, result: 'WIN', setup: 'Trend + Structure', session: 'London' },
+]
+const money = (value: number) => `${value >= 0 ? '+' : '-'}$${Math.abs(value).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+const navItems = [{ label: 'Overview', icon: LayoutDashboard }, { label: 'Trades', icon: Activity }, { label: 'Analytics', icon: BarChart3 }, { label: 'Risk & Money', icon: ShieldCheck }, { label: 'Setups', icon: Target }, { label: 'Journal', icon: BookOpen }, { label: 'Settings', icon: Settings }]
+
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
-
-export default App
+  const [trades, setTrades] = useState(seedTrades)
+  const [activeNav, setActiveNav] = useState('Overview')
+  const [filter, setFilter] = useState<'ALL' | 'WIN' | 'LOSS'>('ALL')
+  const [search, setSearch] = useState('')
+  const [modal, setModal] = useState(false)
+  const [mobileNav, setMobileNav] = useState(false)
+  const [newTrade, setNewTrade] = useState({ pair: 'EURUSD', direction: 'LONG' as Trade['direction'], pnl: '', setup: 'OB + FVG' })
+  const filtered = useMemo(() => trades.filter((trade) => (filter === 'ALL' || trade.result === filter) && `${trade.pair} ${trade.setup} ${trade.id}`.toLowerCase().includes(search.toLowerCase())), [trades, filter, search])
+  const stats = useMemo(() => { const wins = trades.filter((t) => t.result === 'WIN'); const losses = trades.filter((t) => t.result === 'LOSS'); const pnl = trades.reduce((sum, t) => sum + t.pnl, 0); return { pnl, wins: wins.length, losses: losses.length, winRate: (wins.length / (wins.length + losses.length)) * 100, avgRr: wins.reduce((sum, t) => sum + t.rr, 0) / wins.length } }, [trades])
+  const equity = useMemo(() => { let balance = 10000; return [{ date: 'Sep 18', balance }, ...[...trades].reverse().map((trade) => { balance += trade.pnl; return { date: trade.date.split(',')[0], balance } })] }, [trades])
+  const pnlByDay = [{ day: 'Mon', value: 240 }, { day: 'Tue', value: -180 }, { day: 'Wed', value: 420 }, { day: 'Thu', value: -330 }, { day: 'Fri', value: 280 }, { day: 'Sat', value: -75 }, { day: 'Sun', value: 90 }]
+  const addTrade = (event: React.FormEvent) => { event.preventDefault(); const pnl = Number(newTrade.pnl) || 0; setTrades([{ ...seedTrades[0], ...newTrade, id: `#${7422 + trades.length}`, date: 'Oct 11, 09:14', pnl, rr: pnl >= 0 ? 1.8 : -1, result: pnl > 0 ? 'WIN' : 'LOSS' }, ...trades]); setModal(false); setNewTrade({ pair: 'EURUSD', direction: 'LONG', pnl: '', setup: 'OB + FVG' }) }
+  return <div className="app-shell">
+    <header className="topbar"><button className="icon-btn mobile-menu" onClick={() => setMobileNav(!mobileNav)}><Menu size={18} /></button><div className="brand-mark">T<span>↗</span></div><div className="brand"><strong>TechTrek Trades</strong><small>Trading Portfolio</small></div><div className="tagline">Trade with a plan. Let probabilities work.</div><div className="ticker-row"><div className="ticker"><b>EURUSD</b><strong>1.0874</strong><span>+0.32%</span></div><div className="ticker"><b>GBPUSD</b><strong>1.2967</strong><span>+0.21%</span></div><div className="ticker"><b>BTCUSDT</b><strong>67,421.3</strong><span>+1.47%</span></div></div><div className="connection"><i /> Live <small>Last sync: 21:43</small></div><button className="icon-btn"><Settings size={17} /></button></header>
+    <div className="workspace"><aside className={mobileNav ? 'sidebar open' : 'sidebar'}><div className="nav-label">Workspace</div>{navItems.map(({ label, icon: Icon }) => <button key={label} className={activeNav === label ? 'nav-item active' : 'nav-item'} onClick={() => { setActiveNav(label); setMobileNav(false) }}><Icon size={16} />{label}</button>)}<div className="quote">“Discipline compounds faster than money.”<span>— TechTrek</span></div><div className="account"><small>Account</small><b>Exness MT5</b><small>Type</small><b>Standard</b><small>Currency</small><b>USD</b><small>Leverage</small><b>1:200</b><span className="connected"><i /> Connected</span></div></aside>
+      <main className="content"><div className="page-heading"><div><p className="eyebrow">{activeNav} / October 2026</p><h1>{activeNav === 'Overview' ? 'Trading Portfolio' : activeNav}</h1></div><button className="primary-btn" onClick={() => setModal(true)}><Plus size={16} /> Log trade</button></div>
+        <section className="kpi-grid"><Kpi label="Account Balance" value={`$${(10000 + stats.pnl).toLocaleString('en-US', { minimumFractionDigits: 2 })}`} detail={`+24.87%  (+$${stats.pnl.toLocaleString()})`} icon={<CircleDollarSign />} positive /><Kpi label="Total P&L" value={money(stats.pnl)} detail="Realized: +$2,215.60" icon={<TrendingUp />} positive /><Kpi label="Win Rate" value={`${stats.winRate.toFixed(1)}%`} detail={`${stats.wins}W  /  ${stats.losses}L`} icon={<Activity />} /><Kpi label="Risk : Reward" value={`1:${stats.avgRr.toFixed(2)}`} detail="Avg RR per trade" icon={<BarChart3 />} positive /><Kpi label="Total Trades" value={trades.length.toString()} detail="Open: 2   Closed: 72" icon={<BriefcaseBusiness />} /></section>
+        <section className="dashboard-grid"><Panel className="growth-panel" title="Account Growth Curve" subtitle="Equity performance over time" action={<div className="range-tabs"><button className="selected">6M</button><button>1Y</button><button>ALL</button></div>}><div className="chart-wrap"><ResponsiveContainer width="100%" height="100%"><AreaChart data={equity}><defs><linearGradient id="equityFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#15d68b" stopOpacity={.3} /><stop offset="100%" stopColor="#15d68b" stopOpacity={0} /></linearGradient></defs><CartesianGrid stroke="#1b2838" vertical={false} /><XAxis dataKey="date" stroke="#607087" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} /><YAxis stroke="#607087" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} domain={['dataMin - 300', 'dataMax + 300']} /><Tooltip contentStyle={{ background: '#101a29', border: '1px solid #24344a', borderRadius: 8, color: '#fff' }} formatter={(v) => [`$${Number(v).toLocaleString()}`, 'Equity']} /><Area type="monotone" dataKey="balance" stroke="#14dc8d" strokeWidth={2.5} fill="url(#equityFill)" /></AreaChart></ResponsiveContainer></div><div className="legend"><span className="green-line" /> Equity curve <span className="red-line" /> Drawdown</div></Panel><Panel title="Performance Metrics"><div className="metric-list"><Metric label="Total Return" value="+24.87%" positive /><Metric label="Annualized Return" value="+68.4%" positive /><Metric label="Maximum Drawdown" value="-8.73%" negative /><Metric label="Sharpe Ratio" value="1.76" positive /><Metric label="Profit Factor" value="1.82" positive /><Metric label="Avg Win" value="+$234.21" positive /><Metric label="Avg Loss" value="-$142.07" negative /><Metric label="Expectancy" value="+$52.36" positive /></div></Panel><Panel title="Setup Confluences" subtitle="Top contributors"><div className="donut"><div className="donut-hole"><strong>Top</strong><span>Confluences</span></div></div><div className="confluence-list"><span><i className="c-green" /> OB + FVG <b>34.2%</b></span><span><i className="c-blue" /> Liquidity Sweep <b>22.1%</b></span><span><i className="c-purple" /> Trend + Structure <b>18.4%</b></span><span><i className="c-orange" /> EMA Alignment <b>15.8%</b></span></div></Panel></section>
+        <section className="lower-grid"><Panel title="P&L Distribution" subtitle="Weekly realized performance"><div className="bar-chart"><ResponsiveContainer width="100%" height="100%"><BarChart data={pnlByDay}><CartesianGrid stroke="#1b2838" vertical={false} /><XAxis dataKey="day" stroke="#718097" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} /><YAxis hide /><Bar dataKey="value" radius={[3, 3, 0, 0]} fill="#16d88e" /></BarChart></ResponsiveContainer></div></Panel><Panel title="Risk vs Reward (RR)" subtitle="Distribution by outcome"><div className="rr-bars">{['1:1', '1:2', '1:3', '1:4', '1:5', '1:6+'].map((label, index) => <div className="rr-col" key={label}><div className="rr-bar" style={{ height: `${[35, 66, 100, 73, 43, 32][index]}%` }} /><span>{label}</span></div>)}</div></Panel><Panel title="Markets Traded" subtitle="Performance by pair"><div className="market-table"><div className="table-head"><span>Pair</span><span>Trades</span><span>Win rate</span><span>P&L</span></div>{[['EUR/USD', '28', '52.1%', '+$1,124.32'], ['GBP/USD', '20', '55.0%', '+$842.17'], ['BTC/USDT', '12', '50.0%', '+$421.09'], ['XAU/USD', '8', '50.0%', '+$188.55'], ['USD/JPY', '4', '75.0%', '+$91.21']].map((row) => <div className="table-row" key={row[0]}>{row.map((cell, i) => <span className={i === 3 ? 'positive' : ''} key={cell}>{cell}</span>)}</div>)}</div></Panel></section>
+        <section className="trades-panel"><div className="panel-heading"><div><h2>Recent Trades</h2><p>Execution journal and realized performance</p></div><div className="trade-actions"><div className="search"><Search size={14} /><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search trades..." /></div><div className="filter-tabs"><button className={filter === 'ALL' ? 'selected' : ''} onClick={() => setFilter('ALL')}>All</button><button className={filter === 'WIN' ? 'selected' : ''} onClick={() => setFilter('WIN')}>Wins</button><button className={filter === 'LOSS' ? 'selected' : ''} onClick={() => setFilter('LOSS')}>Losses</button><Filter size={14} /></div></div></div><div className="table-scroll"><table><thead><tr><th># / Date</th><th>Pair</th><th>Direction</th><th>Entry</th><th>Exit</th><th>Size</th><th>SL</th><th>TP</th><th>RR</th><th>P&L</th><th>Result</th><th>Setup</th></tr></thead><tbody>{filtered.map((trade) => <tr key={trade.id}><td><strong>{trade.id}</strong><small>{trade.date}</small></td><td><strong>{trade.pair}</strong></td><td className={trade.direction === 'LONG' ? 'positive' : 'negative'}>{trade.direction}</td><td>{trade.entry}</td><td>{trade.exit}</td><td>{trade.size.toFixed(2)}</td><td className="negative">{trade.sl}</td><td className="positive">{trade.tp}</td><td>{trade.rr > 0 ? `1:${trade.rr}` : '-1'}</td><td className={trade.pnl > 0 ? 'positive bold' : 'negative bold'}>{money(trade.pnl)}</td><td><span className={trade.result === 'WIN' ? 'status win' : 'status loss'}>{trade.result}</span></td><td className="setup">{trade.setup}</td></tr>)}</tbody></table></div></section>
++      </main></div>
++    {modal && <div className="modal-backdrop"><form className="modal" onSubmit={addTrade}><button type="button" className="close-btn" onClick={() => setModal(false)}><X size={18} /></button><p className="eyebrow">New execution</p><h2>Log trade</h2><label>Market / Pair<input value={newTrade.pair} onChange={(e) => setNewTrade({ ...newTrade, pair: e.target.value.toUpperCase() })} required /></label><div className="form-grid"><label>Direction<select value={newTrade.direction} onChange={(e) => setNewTrade({ ...newTrade, direction: e.target.value as Trade['direction'] })}><option>LONG</option><option>SHORT</option></select></label><label>P&L ($)<input type="number" value={newTrade.pnl} onChange={(e) => setNewTrade({ ...newTrade, pnl: e.target.value })} placeholder="250" required /></label></div><label>Setup<select value={newTrade.setup} onChange={(e) => setNewTrade({ ...newTrade, setup: e.target.value })}><option>OB + FVG</option><option>Liquidity Sweep</option><option>Trend + Structure</option><option>EMA Alignment</option></select></label><button className="primary-btn submit" type="submit"><Plus size={16} /> Save execution</button></form></div>}
++  </div>
++}
++function Kpi({ label, value, detail, icon, positive }: { label: string; value: string; detail: string; icon: React.ReactNode; positive?: boolean }) { return <div className="kpi panel"><div className="kpi-label"><span>{label}</span><span className={positive ? 'icon-positive' : ''}>{icon}</span></div><strong className={positive ? 'positive' : ''}>{value}</strong><small>{detail}</small>{label === 'Account Balance' && <div className="sparkline"><span /><span /><span /><span /><span /></div>}</div> }
++function Panel({ title, subtitle, action, children, className = '' }: { title: string; subtitle?: string; action?: React.ReactNode; children: React.ReactNode; className?: string }) { return <div className={`panel chart-panel ${className}`}><div className="panel-heading"><div><h2>{title}</h2>{subtitle && <p>{subtitle}</p>}</div>{action}</div>{children}</div> }
++function Metric({ label, value, positive, negative }: { label: string; value: string; positive?: boolean; negative?: boolean }) { return <div><span>{label}</span><strong className={positive ? 'positive' : negative ? 'negative' : ''}>{value}</strong></div> }
+*** End Patch
